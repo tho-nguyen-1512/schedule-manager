@@ -1,0 +1,176 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Dashboard</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="dashboard-period-toolbar">
+    <ion-item class="dashboard-period-item" lines="none">
+      <ion-select
+        label="Period type"
+        labelPlacement="stacked"
+        [(ngModel)]="dashboardPeriodType"
+        (ionChange)="onDashboardPeriodTypeChange()"
+        interface="popover"
+      >
+        <ion-select-option value="week">Week</ion-select-option>
+        <ion-select-option value="month">Month</ion-select-option>
+        <ion-select-option value="quarter">Quarter</ion-select-option>
+        <ion-select-option value="year">Year</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item class="dashboard-period-item" lines="none">
+      <ion-select
+        label="Period"
+        labelPlacement="stacked"
+        [(ngModel)]="dashboardPeriodValue"
+        (ionChange)="onDashboardPeriodValueChange()"
+        interface="popover"
+        placeholder="Select period"
+      >
+        <ion-select-option *ngFor="let o of dashboardPeriodOptions" [value]="o.value">{{ o.label }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </div>
+  <p class="dashboard-period-hint">Summary and charts use tasks whose <strong>end date</strong> falls in: {{ dashboardPeriodLabel }}. Upcoming due uses the next calendar days from server time (see card).</p>
+
+  <!-- Summary cards (scoped by period, except Members / Projects) -->
+  <ion-grid *ngIf="summary">
+    <ion-row>
+      <ion-col size="6" size-md="4" size-lg="2">
+        <ion-card>
+          <ion-card-header><ion-card-subtitle>Members</ion-card-subtitle></ion-card-header>
+          <ion-card-content class="stat-value">{{ summary.totalMembers }}</ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6" size-md="4" size-lg="2">
+        <ion-card>
+          <ion-card-header><ion-card-subtitle>Projects</ion-card-subtitle></ion-card-header>
+          <ion-card-content class="stat-value">{{ summary.totalProjects }}</ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6" size-md="4" size-lg="2">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-subtitle>Tasks</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content class="stat-value">{{ summary.totalTasks }}</ion-card-content>
+          <ion-card-content class="stat-footnote">In selected period</ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6" size-md="4" size-lg="3">
+        <ion-card color="danger">
+          <ion-card-header><ion-card-subtitle style="color:#fff">Delayed</ion-card-subtitle></ion-card-header>
+          <ion-card-content class="stat-value" style="color:#fff">{{ summary.delayedTasksInPeriod }}</ion-card-content>
+          <ion-card-content class="stat-footnote light">In selected period</ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6" size-md="4" size-lg="3">
+        <ion-card color="success">
+          <ion-card-header><ion-card-subtitle style="color:#fff">Completed</ion-card-subtitle></ion-card-header>
+          <ion-card-content class="stat-value" style="color:#fff">{{ summary.completedTasksInPeriod }}</ion-card-content>
+          <ion-card-content class="stat-footnote light">DONE in selected period</ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-grid *ngIf="summary">
+    <ion-row>
+      <ion-col size="12" size-lg="5">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Task status distribution</ion-card-title>
+            <ion-card-subtitle>TODO · IN_PROGRESS · DONE (end date in selected period)</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="doughnut-chart-wrap">
+              <canvas baseChart [data]="statusDoughnutData" [options]="statusDoughnutOptions" type="doughnut"></canvas>
+              <div class="doughnut-center" aria-hidden="true">
+                <span class="doughnut-center-value">{{ statusChartTotal }}</span>
+                <span class="doughnut-center-label">tasks</span>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="12" size-lg="7">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Project health overview</ion-card-title>
+            <ion-card-subtitle>Per project: Done, on-track (not done, not delayed), delayed — end date in selected period</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <div
+              *ngIf="summary.projectHealthByProject?.length"
+              class="project-health-chart-wrap"
+              [style.--project-health-cols]="summary.projectHealthByProject.length || 1"
+            >
+              <canvas baseChart [data]="projectHealthStackedData" [options]="projectHealthStackedOptions" type="bar"></canvas>
+            </div>
+            <p *ngIf="!summary.projectHealthByProject?.length" class="chart-empty">No tasks with end date in this period.</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12" size-lg="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Member workload</ion-card-title>
+            <div class="member-workload-segment">
+              <ion-segment [(ngModel)]="memberWorkloadMode" (ionChange)="onMemberWorkloadModeChange()">
+                <ion-segment-button value="ontime">
+                  <ion-label>On-time</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="delay">
+                  <ion-label>Delay</ion-label>
+                </ion-segment-button>
+              </ion-segment>
+            </div>
+            <ion-card-subtitle *ngIf="memberWorkloadMode === 'ontime'"
+              >DONE tasks per member (end date in selected period).</ion-card-subtitle>
+            <ion-card-subtitle *ngIf="memberWorkloadMode === 'delay'"
+              >Delayed tasks per member (same period; progress under 100% and past end date).</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <div
+              class="member-bar-chart-wrap"
+              [style.--member-bar-rows]="summary.memberWorkloadRanking.length || 1"
+            >
+              <canvas baseChart [data]="memberWorkloadBarData" [options]="memberWorkloadBarOptions" type="bar"></canvas>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="12" size-lg="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Upcoming due tasks</ion-card-title>
+            <div class="upcoming-due-segment">
+              <ion-segment [(ngModel)]="upcomingDueHorizon" (ionChange)="onUpcomingHorizonChange()">
+                <ion-segment-button [value]="7">
+                  <ion-label>7 days</ion-label>
+                </ion-segment-button>
+                <ion-segment-button [value]="14">
+                  <ion-label>14 days</ion-label>
+                </ion-segment-button>
+              </ion-segment>
+            </div>
+            <ion-card-subtitle>Stacked by project (one color per project). Incomplete tasks only; server today UTC; not filtered by period above</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <div *ngIf="upcomingDueHasSeries" class="upcoming-due-chart-wrap">
+              <canvas baseChart [data]="upcomingDueBarData" [options]="upcomingDueBarOptions" type="bar"></canvas>
+            </div>
+            <p *ngIf="summary && !upcomingDueHasSeries" class="chart-empty">No incomplete tasks due in the next 14 days.</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

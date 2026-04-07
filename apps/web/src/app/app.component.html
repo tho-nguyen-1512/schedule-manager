@@ -1,0 +1,71 @@
+<ion-app class="app-shell">
+  <ion-split-pane
+    contentId="main-content"
+    class="app-split-pane"
+    [class.split-menu-collapsed]="menuCollapsed"
+  >
+    <ion-menu
+      contentId="main-content"
+      type="overlay"
+      [class.app-menu--collapsed]="menuCollapsed"
+    >
+      <ion-header>
+        <ion-toolbar color="primary" [class.app-menu-toolbar--collapsed]="menuCollapsed">
+          <ion-buttons slot="start">
+            <!-- Native button + inline SVG: ion-button shadow DOM often hides / wrong-colors ion-icon here -->
+            <button
+              type="button"
+              class="app-menu-toggle-native"
+              (click)="toggleMenuRail()"
+              [attr.aria-label]="menuCollapsed ? 'Expand menu' : 'Collapse menu'"
+            >
+              <svg
+                *ngIf="menuCollapsed"
+                class="app-menu-toggle-svg"
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path fill="currentColor" d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z" />
+              </svg>
+              <svg
+                *ngIf="!menuCollapsed"
+                class="app-menu-toggle-svg"
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  fill="currentColor"
+                  d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"
+                />
+              </svg>
+            </button>
+          </ion-buttons>
+          <ion-title *ngIf="!menuCollapsed" size="small" class="app-menu-title">Menu</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="app-menu-content">
+        <ion-list lines="none">
+          <ion-menu-toggle auto-hide="false" *ngFor="let item of menuItems">
+            <ion-item
+              [routerLink]="item.url"
+              routerLinkActive="selected"
+              routerDirection="root"
+              lines="none"
+              [title]="item.title"
+            >
+              <ion-icon slot="start" [name]="item.icon" aria-hidden="true"></ion-icon>
+              <ion-label class="app-menu-label">{{ item.title }}</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+        </ion-list>
+      </ion-content>
+    </ion-menu>
+    <ion-router-outlet id="main-content"></ion-router-outlet>
+  </ion-split-pane>
+</ion-app>

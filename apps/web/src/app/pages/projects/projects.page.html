@@ -1,0 +1,102 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
+    <ion-title>Projects</ion-title>
+  </ion-toolbar>
+  <ion-toolbar class="filter-toolbar">
+    <ion-grid>
+      <ion-row class="ion-align-items-center">
+        <ion-col>
+          <span style="font-weight:600;font-size:1rem">All Projects ({{ projects.length }})</span>
+        </ion-col>
+        <ion-col class="ion-text-end">
+          <ion-button color="success" (click)="openCreate()">
+            <ion-icon slot="start" name="add-circle-outline"></ion-icon> Add Project
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ag-grid-angular
+    style="width: 100%; height: 100%"
+    class="ag-theme-alpine"
+    [rowData]="projects"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    [getRowId]="getRowId"
+    (gridReady)="onGridReady($event)"
+  ></ag-grid-angular>
+
+  <ion-modal #formModal>
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ isEditing ? 'Edit' : 'New' }} Project</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="formModal.dismiss()">Close</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-item>
+          <ion-input label="Project Name *" labelPlacement="stacked" [(ngModel)]="form.name" placeholder="Project name"></ion-input>
+        </ion-item>
+
+        <!-- Sub-Projects -->
+        <div class="array-field-group">
+          <div class="array-field-header">
+            <span class="field-label">Sub-Projects *</span>
+            <button class="arr-add-btn" (click)="addSubField()">＋</button>
+          </div>
+          <div *ngFor="let sub of form.subProjects; let i = index; trackBy: trackByIdx" class="array-field-row">
+            <ion-input [(ngModel)]="form.subProjects[i].name" placeholder="Sub-project name"></ion-input>
+            <button class="arr-remove-btn" (click)="removeSubField(i)">✕</button>
+          </div>
+        </div>
+
+        <!-- Emails -->
+        <div class="array-field-group">
+          <div class="array-field-header">
+            <span class="field-label">Emails</span>
+            <button class="arr-add-btn" (click)="addField('emails')">＋</button>
+          </div>
+          <div *ngFor="let item of form.emails; let i = index; trackBy: trackByIdx" class="array-field-row">
+            <ion-input [(ngModel)]="form.emails[i]" placeholder="email@example.com"></ion-input>
+            <button *ngIf="item.length > 0" class="arr-remove-btn" (click)="removeField('emails', i)">✕</button>
+          </div>
+        </div>
+
+        <!-- Resources -->
+        <div class="array-field-group">
+          <div class="array-field-header">
+            <span class="field-label">Resources</span>
+            <button class="arr-add-btn" (click)="addField('resources')">＋</button>
+          </div>
+          <div *ngFor="let item of form.resources; let i = index; trackBy: trackByIdx" class="array-field-row">
+            <ion-input [(ngModel)]="form.resources[i]" placeholder="https://github.com/..."></ion-input>
+            <button *ngIf="item.length > 0" class="arr-remove-btn" (click)="removeField('resources', i)">✕</button>
+          </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="array-field-group">
+          <div class="array-field-header">
+            <span class="field-label">Documents</span>
+            <button class="arr-add-btn" (click)="addField('documents')">＋</button>
+          </div>
+          <div *ngFor="let item of form.documents; let i = index; trackBy: trackByIdx" class="array-field-row">
+            <ion-input [(ngModel)]="form.documents[i]" placeholder="https://docs.google.com/..."></ion-input>
+            <button *ngIf="item.length > 0" class="arr-remove-btn" (click)="removeField('documents', i)">✕</button>
+          </div>
+        </div>
+
+        <ion-button expand="block" class="ion-margin-top" (click)="save()" [disabled]="!form.name || !form.subProjects[0]?.name">
+          {{ isEditing ? 'Update' : 'Create' }}
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

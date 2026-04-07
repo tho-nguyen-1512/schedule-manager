@@ -1,0 +1,84 @@
+---
+description: Project-wide rules for the MVP member and task dashboard
+alwaysApply: true
+---
+# Project Rules
+
+## Scope
+- This project is an MVP local web dashboard for managing members, projects, assignments, tasks, reports, and Dashboard summaries (no separate Analytics screen).
+- Keep the implementation minimal and practical.
+- Do not introduce features outside the documented scope.
+
+## Source of Truth
+Always stay consistent with:
+- docs/PRD.md
+- docs/DATA_MODEL.md
+- docs/API_CONTRACT.md
+- docs/STACK_DECISIONS.md
+
+If implementation conflicts with documentation, update the implementation to match the docs unless explicitly asked to revise the docs first.
+
+## Phase 1 Constraints
+- No authentication or authorization system
+- No realtime collaboration
+- No notifications
+- No file attachments
+- No soft delete unless explicitly requested
+- No pagination unless necessary for MVP completion
+
+## Locked MVP Decisions
+- Backend: NestJS + Prisma + SQLite
+- Frontend: Ionic Angular
+- Schedule grid: AG Grid Community
+- Charts: Chart.js with ng2-charts
+- Default export format: CSV (library: `csv-stringify`)
+- Delay fields (`delayDays`, `isDelayed`) include both DONE tasks (`delayDays = max(0, completionDate - endDate)`) and overdue incomplete tasks (`delayDays = today - endDate` when `today > endDate`) for CSV, schedule, and Dashboard metrics
+- Each task belongs to exactly one member, one project, and one sub project
+- `completionDate` is required when `status = DONE`; must be null otherwise
+- `durationDays` is always computed from `startDate`/`endDate` at read time; it is never stored in the database
+
+## Editing Behavior
+- Only modify files directly related to the current task.
+- Do not refactor unrelated modules.
+- Do not rename files, folders, DTOs, entities, routes, or components unless necessary.
+- Prefer small, localized changes over broad rewrites.
+- Preserve existing naming consistency.
+
+## Coding Style
+- Prefer simple, readable, maintainable code.
+- Avoid unnecessary abstractions and premature optimization.
+- Use clear module boundaries.
+- Add minimal validation and error handling where appropriate.
+- Keep API responses consistent with docs/API_CONTRACT.md.
+
+## Workflow
+For each task:
+1. Read the relevant docs first.
+2. Identify the exact files to change.
+3. Make the smallest working implementation.
+4. Keep frontend and backend aligned with the contract.
+5. Do not generate unrelated code.
+
+## Backend Conventions
+- Use feature-based NestJS modules.
+- Keep controller, service, and DTO responsibilities separated.
+- Use Prisma for data access.
+- Keep database schema aligned with docs/DATA_MODEL.md.
+- All JSON responses must use the envelope: `{ data, meta }` for success and `{ error, meta }` for errors (see docs/API_CONTRACT.md §2).
+- When a task is created or updated with a `projectId` that has no sub projects, auto-create a sub project with the same name as the project and assign it to the task.
+- Add a health endpoint early.
+
+## Frontend Conventions
+- Organize pages by feature.
+- Keep UI simple and usable.
+- Prefer form-based CRUD and grid-based task editing.
+- Keep API calls centralized when practical.
+- Do not introduce heavy state management unless needed.
+
+## Safety Checks
+Before finishing any task, verify:
+- Is it still inside MVP scope?
+- Does it match the PRD, data model, and API contract?
+- Were unrelated files left untouched?
+- Is the change small enough to review easily?
+- If a task has `status = DONE`, does it have a `completionDate`? If not `DONE`, is `completionDate` null?

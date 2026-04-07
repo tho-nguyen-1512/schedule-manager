@@ -1,0 +1,194 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.schedule-content {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+}
+
+.schedule-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.schedule-grid-wrap {
+  flex: 1 1 auto;
+  min-height: 280px;
+  height: 52vh;
+  width: 100%;
+}
+
+.schedule-ag-grid {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.timeline-card {
+  flex: 0 0 auto;
+}
+
+.schedule-table-card {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin: 28px 16px 16px;
+}
+
+.schedule-card-content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding-top: 8px;
+}
+
+.schedule-filter-toolbar {
+  flex: 0 0 auto;
+  margin-bottom: 12px;
+}
+
+.schedule-card-content > .schedule-grid-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.gantt-filters {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.gantt-filter-item {
+  min-width: 200px;
+  flex: 1;
+  max-width: 300px;
+  --background: transparent;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+}
+
+.gantt-container {
+  overflow-x: auto;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+}
+
+.gantt-table {
+  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+
+  th,
+  td {
+    border: 1px solid #d0d5dd;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  thead th {
+    background: #f0f2f5;
+    color: #344054;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 8px 4px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+}
+
+.gantt-label-col {
+  min-width: 140px;
+  max-width: 200px;
+  text-align: left !important;
+  padding-left: 12px !important;
+}
+
+.gantt-day-col {
+  width: 28px;
+  min-width: 28px;
+  max-width: 28px;
+}
+
+.gantt-label-cell {
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  background: #fff;
+}
+
+.gantt-project-cell {
+  color: #667085;
+  font-weight: 400;
+}
+
+.gantt-member-cell {
+  color: #344054;
+  font-weight: 500;
+}
+
+.gantt-day-cell {
+  width: 28px;
+  min-width: 28px;
+  max-width: 28px;
+  height: 32px;
+  padding: 0;
+  background: #fff;
+  transition: background 0.1s;
+
+  &.active.bar-default {
+    background: #4a90d9;
+  }
+
+  &.active.bar-done {
+    background: #2dd36f;
+  }
+
+  &.active.bar-delayed {
+    background: #eb445a;
+  }
+}
+
+tbody tr:nth-child(odd) .gantt-day-cell:not(.active),
+tbody tr:nth-child(odd) .gantt-label-cell {
+  background: #fafbfc;
+}
+
+tbody tr:hover td {
+  background: #edf2f7 !important;
+}
+
+tbody tr:hover td.active.bar-default {
+  background: #3a7bc8 !important;
+}
+
+tbody tr:hover td.active.bar-done {
+  background: #26c362 !important;
+}
+
+tbody tr:hover td.active.bar-delayed {
+  background: #d13d52 !important;
+}
+
+.gantt-empty {
+  text-align: center;
+  color: #667085;
+  padding: 32px 16px;
+  font-size: 14px;
+}

@@ -1,0 +1,58 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
+    <ion-title>Reports</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Monthly Report</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-input label="Month" labelPlacement="stacked" type="month" [(ngModel)]="selectedMonth"></ion-input>
+      </ion-item>
+      <ion-button expand="block" class="ion-margin-top" (click)="downloadMonthly()" [disabled]="!selectedMonth">
+        <ion-icon slot="start" name="download-outline"></ion-icon>
+        Download Monthly CSV
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Weekly Report</ion-card-title>
+      <ion-card-subtitle>ISO week (same as dashboard). Defaults to this week.</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item lines="none">
+        <ion-select
+          label="Year"
+          labelPlacement="stacked"
+          [(ngModel)]="reportYear"
+          interface="popover"
+          placeholder="Year"
+        >
+          <ion-select-option *ngFor="let y of reportYearOptions" [value]="y">{{ y }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item lines="none">
+        <ion-select
+          label="Week"
+          labelPlacement="stacked"
+          [(ngModel)]="reportWeek"
+          interface="popover"
+          placeholder="Week"
+        >
+          <ion-select-option *ngFor="let o of reportWeekOptions" [value]="o.value">{{ o.label }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-button expand="block" class="ion-margin-top" (click)="downloadWeekly()">
+        <ion-icon slot="start" name="download-outline"></ion-icon>
+        Download Weekly CSV
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Member {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  email       String?
+  role        String?
+  dateOfBirth String?
+  phone       String?
+  startDate   String?
+
+  coreProjects    MemberCoreProject[]
+  supportProjects MemberSupportProject[]
+  assignments     Assignment[]
+  tasks           Task[]
+}
+
+model MemberCoreProject {
+  id        String @id @default(cuid())
+  memberId  String
+  projectId String
+
+  member  Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, projectId])
+}
+
+model MemberSupportProject {
+  id        String @id @default(cuid())
+  memberId  String
+  projectId String
+
+  member  Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, projectId])
+}
+
+model Project {
+  id       String  @id @default(cuid())
+  name     String
+  email    String?
+  resource String?
+  document String?
+
+  subProjects          SubProject[]
+  assignments          Assignment[]
+  tasks                Task[]
+  memberCoreEntries    MemberCoreProject[]
+  memberSupportEntries MemberSupportProject[]
+}
+
+model SubProject {
+  id              String @id @default(cuid())
+  name            String
+  parentProjectId String
+
+  parentProject Project      @relation(fields: [parentProjectId], references: [id], onDelete: Cascade)
+  assignments   Assignment[]
+  tasks         Task[]
+}
+
+model Assignment {
+  id           String  @id @default(cuid())
+  memberId     String?
+  projectId    String?
+  subProjectId String?
+
+  member     Member?     @relation(fields: [memberId], references: [id], onDelete: SetNull)
+  project    Project?    @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  subProject SubProject? @relation(fields: [subProjectId], references: [id], onDelete: SetNull)
+
+  @@unique([memberId, projectId, subProjectId])
+}
+
+model Task {
+  id              String  @id @default(cuid())
+  title           String
+  memberId        String?
+  projectId       String?
+  subProjectId    String?
+  startDate       String
+  endDate         String
+  completionDate  String?
+  progressPercent Int     @default(0)
+  status          String  @default("TODO")
+  comments        String?
+  priority        String  @default("MEDIUM")
+
+  member     Member?     @relation(fields: [memberId], references: [id], onDelete: SetNull)
+  project    Project?    @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  subProject SubProject? @relation(fields: [subProjectId], references: [id], onDelete: SetNull)
+
+  @@index([memberId])
+  @@index([projectId])
+  @@index([endDate])
+  @@index([status])
+}

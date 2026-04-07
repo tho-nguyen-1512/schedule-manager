@@ -1,0 +1,78 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
+    <ion-title>Assignments</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card class="data-table-card">
+    <div class="toolbar-row">
+      <h2>All Assignments ({{ assignments.length }})</h2>
+      <ion-button size="small" (click)="openAdd()">
+        <ion-icon slot="start" name="add-outline"></ion-icon> Add Assignment
+      </ion-button>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Member</th>
+          <th>Project</th>
+          <th>Backup Project</th>
+          <th class="actions-cell">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let a of assignments; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td><strong>{{ a.member?.name || a.memberId }}</strong></td>
+          <td>{{ a.project?.name || a.projectId }}</td>
+          <td>{{ a.subProject?.name || a.subProjectId }}</td>
+          <td class="actions-cell">
+            <ion-button fill="outline" size="small" color="danger" (click)="confirmDelete(a)">
+              <ion-icon slot="start" name="trash-outline"></ion-icon> Remove
+            </ion-button>
+          </td>
+        </tr>
+        <tr *ngIf="assignments.length === 0" class="empty-row">
+          <td colspan="5">No assignments yet. Click "Add Assignment" to create one.</td>
+        </tr>
+      </tbody>
+    </table>
+  </ion-card>
+
+  <ion-modal #addModal>
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>New Assignment</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="addModal.dismiss()">Close</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-item>
+          <ion-select label="Member *" labelPlacement="stacked" [(ngModel)]="form.memberId" placeholder="Select member">
+            <ion-select-option *ngFor="let m of members" [value]="m.id">{{ m.name }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-select label="Project *" labelPlacement="stacked" [(ngModel)]="form.projectId" (ionChange)="onProjectChange()" placeholder="Select project">
+            <ion-select-option *ngFor="let p of projects" [value]="p.id">{{ p.name }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-select label="Backup Project *" labelPlacement="stacked" [(ngModel)]="form.subProjectId" placeholder="Select backup project" [disabled]="filteredSubs.length === 0">
+            <ion-select-option *ngFor="let s of filteredSubs" [value]="s.id">{{ s.name }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-button expand="block" class="ion-margin-top" (click)="saveAssignment()" [disabled]="!form.memberId || !form.projectId || !form.subProjectId">
+          Create Assignment
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

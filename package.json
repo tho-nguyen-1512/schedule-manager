@@ -1,0 +1,7 @@
+{
+  "name": "member-management-project",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ]
+}

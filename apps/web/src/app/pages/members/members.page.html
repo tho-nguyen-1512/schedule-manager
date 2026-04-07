@@ -1,0 +1,79 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
+    <ion-title>Members</ion-title>
+  </ion-toolbar>
+  <ion-toolbar class="filter-toolbar">
+    <ion-grid>
+      <ion-row class="ion-align-items-center">
+        <ion-col>
+          <span style="font-weight:600;font-size:1rem">All Members ({{ members.length }})</span>
+        </ion-col>
+        <ion-col class="ion-text-end">
+          <ion-button color="success" (click)="openCreate()">
+            <ion-icon slot="start" name="add-circle-outline"></ion-icon> Add Member
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ag-grid-angular
+    style="width: 100%; height: 100%"
+    class="ag-theme-alpine"
+    [rowData]="members"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    [getRowId]="getRowId"
+    (gridReady)="onGridReady($event)"
+  ></ag-grid-angular>
+
+  <ion-modal #formModal>
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ isEditing ? 'Edit' : 'New' }} Member</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="formModal.dismiss()">Close</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-item>
+          <ion-input label="Name *" labelPlacement="stacked" [(ngModel)]="form.name" placeholder="Full name"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-select label="Project *" labelPlacement="stacked" [(ngModel)]="form.coreProjectIds" [multiple]="true" placeholder="Select project(s)">
+            <ion-select-option *ngFor="let p of projects" [value]="p.id">{{ p.name }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-select label="Backup Projects" labelPlacement="stacked" [(ngModel)]="form.supProjectIds" [multiple]="true" placeholder="Select (optional)">
+            <ion-select-option *ngFor="let p of backupProjectOptions" [value]="p.id">{{ p.name }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-input label="Email" labelPlacement="stacked" [(ngModel)]="form.email" type="email" placeholder="Optional"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input label="Role" labelPlacement="stacked" [(ngModel)]="form.role" placeholder="Optional"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input label="Phone" labelPlacement="stacked" [(ngModel)]="form.phone" placeholder="Optional"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input label="Date of Birth" labelPlacement="stacked" [(ngModel)]="form.dateOfBirth" type="date"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input label="Start Date" labelPlacement="stacked" [(ngModel)]="form.startDate" type="date"></ion-input>
+        </ion-item>
+        <ion-button expand="block" class="ion-margin-top" (click)="save()"
+          [disabled]="!form.name || !form.coreProjectIds?.length">
+          {{ isEditing ? 'Update' : 'Create' }}
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
