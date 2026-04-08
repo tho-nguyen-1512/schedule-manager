@@ -76,11 +76,9 @@ You do **not** need to install SQLite separately. The database is a single file 
 ### 1. Clone and enter the project
 
 ```bash
-git clone <repository-url> member-management-project
+git clone tho-nguyen-1512/schedule-manager
 cd member-management-project
 ```
-
-Replace `<repository-url>` with your Git remote. If you already have the folder, only run `cd` into it.
 
 ---
 
