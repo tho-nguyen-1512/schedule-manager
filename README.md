@@ -31,8 +31,6 @@ Each **task** belongs to exactly one member, one project, and one sub project. I
 - When `status = DONE`, `completionDate` is **required**; otherwise `completionDate` must be null.
 - Delay fields (`delayDays`, `isDelayed`) are consistent across CSV, schedule, and Dashboard (includes late DONE tasks and incomplete tasks past `endDate`).
 
-**Out of scope for MVP:** authentication / authorization, realtime, notifications, file attachments, soft delete (by default), pagination (unless clearly needed), XLSX/PDF export.
-
 ---
 
 ## Repository layout
